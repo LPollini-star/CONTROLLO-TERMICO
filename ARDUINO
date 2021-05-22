@@ -1,0 +1,59 @@
+//arduino
+#include <dht11.h>
+
+dht11 DHT;
+
+#define DHT11PIN 8
+
+int ledPin_RED = 3;
+int ledPin_GREEN = 9;
+int interruttore = 13;
+
+void setup(){
+  Serial.begin(9600);
+  pinMode(ledPin_RED, OUTPUT);
+   pinMode(ledPin_GREEN, OUTPUT);
+   pinMode(interruttore, INPUT);
+  
+  digitalWrite(ledPin_RED, LOW);
+  digitalWrite(ledPin_GREEN, LOW);
+  
+}
+
+void loop(){
+  int stato = digitalRead(interruttore);
+  if(stato==HIGH){
+    digitalWrite(ledPin_GREEN, HIGH);
+    controllo();
+    lettura();
+  }else{
+    digitalWrite(ledPin_GREEN, LOW);
+    digitalWrite(ledPin_RED, LOW);
+  }
+    
+}
+
+long vecchioTempo=0;
+
+void lettura(){
+    if(millis()-vecchioTempo>=10000){
+      vecchioTempo=millis();
+      int chk = DHT.read(DHT11PIN);
+      delay(1000);
+      int temp = DHT.temperature;
+      int umi = DHT.humidity;
+      Serial.print(umi);
+      Serial.print(" ");
+      Serial.print(temp);
+      Serial.println("   "); 
+    }  
+}
+
+void controllo(){
+  int val = Serial.read();
+  if(val == '1'){
+    digitalWrite(ledPin_RED, HIGH); 
+  }else if(val=='0'){
+    digitalWrite(ledPin_RED, LOW);
+  }
+}
